@@ -1,0 +1,14 @@
+global:
+  scrape_interval:     15s
+  evaluation_interval: 15s
+
+rule_files:
+# - "first.rules"
+# - "second.rules"
+
+scrape_configs:
+  - job_name: postgres-exporter
+    static_configs:
+      - targets:
+        - 'localhost:54380' # node-exporter on http://localhost:54380/metrics
+        - 'localhost:54381' # node-exporter on http://localhost:54381/metrics

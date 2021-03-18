@@ -1,0 +1,61 @@
+version: '3'
+
+services:
+
+  postgres-exporter:
+    restart: on-failure
+    image: goforbroke1006/postgres-exporter
+    command: "--addr=0.0.0.0:54381 --target=postgresql://db_user:db_pass@localhost:5432/db_name?sslmode=disable"
+    depends_on:
+      - postgres
+    network_mode: host
+
+  postgres:
+    image: library/postgres:9.6
+    environment:
+      POSTGRES_DB: 'db_name'
+      POSTGRES_USER: 'db_user'
+      POSTGRES_PASSWORD: 'db_pass'
+    #    ports:
+    #      - 5432:5432
+    volumes:
+      - ./.docker-compose/postgres/migrations/:/docker-entrypoint-initdb.d/
+      - postgresql-data:/var/lib/postgresql/data
+    network_mode: host
+
+  grafana:
+    restart: always
+    image: grafana/grafana:7.4.3-ubuntu
+    depends_on:
+      - prometheus
+    #    ports:
+    #      - 3000:3000
+    entrypoint: [ "bash", "/setup.sh" ]
+    volumes:
+      - ./.docker-compose/grafana/datasources:/etc/grafana/datasources
+      - ./.docker-compose/grafana/setup.sh:/setup.sh
+      - ./dashboard.json:/etc/grafana/dashboards/dashboard.json
+      - grafana-data:/var/lib/grafana
+      - grafana-prov:/etc/grafana/provisioning/
+    environment:
+      - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    network_mode: host
+
+  prometheus:
+    restart: always
+    image: prom/prometheus:v2.22.2
+    volumes:
+      - ./.docker-compose/prometheus/:/etc/prometheus/
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --web.enable-lifecycle
+    #    ports:
+    #      - 9090:9090
+    network_mode: host
+
+volumes:
+  grafana-data: ~
+  grafana-prov: ~
+  postgresql-data: ~
