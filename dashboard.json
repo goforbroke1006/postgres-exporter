@@ -16,6 +16,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 0,
+  "iteration": 1616151620698,
   "links": [],
   "panels": [
     {
@@ -68,7 +69,7 @@
         {
           "expr": "rate(postgres_exporter_dead_tuples[5m])",
           "interval": "",
-          "legendFormat": "",
+          "legendFormat": "{{location }} - {{ database }} - {{ schema }} - {{ table }}",
           "refId": "A"
         }
       ],
@@ -121,7 +122,29 @@
     "postgres"
   ],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "current": {
+          "selected": true,
+          "text": "Prometheus",
+          "value": "Prometheus"
+        },
+        "description": null,
+        "error": null,
+        "hide": 0,
+        "includeAll": false,
+        "label": "Data source",
+        "multi": false,
+        "name": "DATA_SOURCE",
+        "options": [],
+        "query": "prometheus",
+        "queryValue": "",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "type": "datasource"
+      }
+    ]
   },
   "time": {
     "from": "now-30m",

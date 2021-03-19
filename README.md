@@ -13,10 +13,3 @@ docker run --name=pg-exporter -it --rm --network=host \
 ```
 
 open http://localhost:54380/metrics
-
-### Local development
-
-```bash
-docker-compose down --volumes
-docker-compose up -d
-```
