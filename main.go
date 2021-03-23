@@ -32,6 +32,10 @@ func main() {
 
 	logrus.SetReportCaller(true)
 
+	if target == "" {
+		logrus.Panic(`"target" argument is required`)
+	}
+
 	go func() {
 		http.Handle("/metrics", metrics.NewHandler())
 		if err := http.ListenAndServe(httpAddr, nil); err != nil {
@@ -50,7 +54,8 @@ func main() {
 		targetDatabase = conn.Config().ConnConfig.Database
 	)
 	var (
-		repo = repository.NewStatUserTablesRepository(conn)
+		statUserTablesRepository = repository.NewStatUserTablesRepository(conn)
+		lockRepository           = repository.NewLockRepository(conn)
 	)
 
 	jobRunner := periodic.NewJobRunner(
@@ -58,13 +63,19 @@ func main() {
 			Name:      "live-tuples",
 			Period:    30 * time.Second,
 			RunOnInit: true,
-			Function:  job.CheckLiveTuples(repo, targetLocation, targetDatabase),
+			Function:  job.CheckLiveTuples(statUserTablesRepository, targetLocation, targetDatabase),
 		},
 		periodic.Task{
 			Name:      "dead-tuples",
 			Period:    30 * time.Second,
 			RunOnInit: true,
-			Function:  job.CheckDeadTuples(repo, targetLocation, targetDatabase),
+			Function:  job.CheckDeadTuples(statUserTablesRepository, targetLocation, targetDatabase),
+		},
+		periodic.Task{
+			Name:      "active-locks",
+			Period:    5 * time.Second,
+			RunOnInit: true,
+			Function:  job.CheckActiveLocks(lockRepository, targetLocation, targetDatabase),
 		},
 	)
 	go jobRunner.Run()

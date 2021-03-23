@@ -18,4 +18,16 @@ var (
 	}, []string{
 		"location", "database", "schema", "table",
 	})
+	ActiveLockCount = promauto.NewCounterVec(prometheus.CounterOpts{
+		Name: "postgres_exporter_active_lock_count",
+		Help: "Count of active locks",
+	}, []string{
+		"location", "database", "schema", "table",
+	})
+	ActiveLockDuration = promauto.NewCounterVec(prometheus.CounterOpts{
+		Name: "postgres_exporter_active_lock_duration",
+		Help: "Total duration of active locks",
+	}, []string{
+		"location", "database", "schema", "table",
+	})
 )

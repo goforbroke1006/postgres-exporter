@@ -12,6 +12,8 @@ func NewHandler() http.Handler {
 	r.MustRegister(
 		LiveTuples,
 		DeadTuples,
+		ActiveLockCount,
+		ActiveLockDuration,
 	)
 	return promhttp.HandlerFor(r, promhttp.HandlerOpts{})
 }

@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+
 	"github.com/jackc/pgx/v4/pgxpool"
 
 	"postgres-exporter/internal"
